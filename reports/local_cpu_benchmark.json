@@ -1,0 +1,28 @@
+{
+  "cpu": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+  "logical_cpus": 8,
+  "ram_gib": 15.81,
+  "available_ram_gib": 6.92,
+  "fold_rows": 3491,
+  "input_features": 95,
+  "fits": [
+    {
+      "name": "logistic_standard",
+      "seconds": 9.667,
+      "warnings": []
+    },
+    {
+      "name": "logistic_robust",
+      "seconds": 12.189,
+      "warnings": [
+        "The max_iter was reached which means the coef_ did not converge"
+      ]
+    },
+    {
+      "name": "xgboost_300_trees",
+      "seconds": 2.301,
+      "warnings": []
+    }
+  ],
+  "held_out_evaluated": false
+}

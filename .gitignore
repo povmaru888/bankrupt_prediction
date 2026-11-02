@@ -1,0 +1,27 @@
+# Python environments, caches, and build output
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Request-scoped files, generated previews, and local logs
+tmp/
+logs/*
+!logs/.gitkeep
+
+# Model binaries and machine-local activation pointer
+models/*
+!models/.gitkeep
+models/**/*.joblib
+models/**/*.pkl
+models/**/*.pickle
+models/**/*.ubj
+models/active.json
+experiments/**/*.joblib

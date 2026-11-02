@@ -1,0 +1,77 @@
+{
+  "protocol": {
+    "seed": 42,
+    "search_iterations": 30,
+    "cv_folds": 5,
+    "selection_partition": "validation",
+    "final_test_accessed": false,
+    "data_sha256": "dcfe1942e8c38da462db41d4cc339bcba8351e7b2e39cdd8a29a8887db6ecf98",
+    "rank_grouping": "one query per fit because the source has no query ID",
+    "huber_weighting": "fold-local negative/positive balanced sample weights"
+  },
+  "binary_logistic": {
+    "source_package": "candidate-20261022T105726Z-155ceb0b",
+    "validation_metrics": {
+      "average_precision": 0.5365993978362716,
+      "recall_at_top_10_percent": 0.8571428571428571,
+      "precision_at_top_10_percent": 0.2727272727272727,
+      "ndcg_at_top_10_percent": 0.7981703103828677,
+      "top_10_percent_row_count": 110,
+      "top_10_percent_positive_count": 30
+    }
+  },
+  "rank_pairwise": {
+    "search_cv_average_precision": 0.45455068104645246,
+    "best_parameters": {
+      "classifier__colsample_bytree": 0.996884623716487,
+      "classifier__lambdarank_num_pair_per_sample": 4,
+      "classifier__learning_rate": 0.028145092716060652,
+      "classifier__max_depth": 8,
+      "classifier__min_child_weight": 9,
+      "classifier__n_estimators": 660,
+      "classifier__reg_alpha": 0.0005284111125757584,
+      "classifier__reg_lambda": 0.09984006580328653,
+      "classifier__subsample": 0.6186662652854461
+    },
+    "validation_metrics": {
+      "average_precision": 0.575851129718706,
+      "recall_at_top_10_percent": 0.8285714285714286,
+      "precision_at_top_10_percent": 0.2636363636363636,
+      "ndcg_at_top_10_percent": 0.7991314914295763,
+      "top_10_percent_row_count": 110,
+      "top_10_percent_positive_count": 29
+    },
+    "elapsed_seconds": 660.3120000000054,
+    "model_file": "xgboost_rank_pairwise.joblib",
+    "model_sha256": "af98c9b8ee2a54ca206c012e3a7108b452230be62dfe9d1f96c7a7bee243a85a"
+  },
+  "pseudo_huber": {
+    "search_cv_average_precision": 0.4266361187589894,
+    "best_parameters": {
+      "classifier__colsample_bytree": 0.8688542189623514,
+      "classifier__huber_slope": 3.336101309469785,
+      "classifier__learning_rate": 0.02243982507529705,
+      "classifier__max_depth": 9,
+      "classifier__min_child_weight": 6,
+      "classifier__n_estimators": 379,
+      "classifier__reg_alpha": 0.00017088569538004368,
+      "classifier__reg_lambda": 82.62580514284332,
+      "classifier__subsample": 0.7595297769778212
+    },
+    "validation_metrics": {
+      "average_precision": 0.5363300148037166,
+      "recall_at_top_10_percent": 0.8571428571428571,
+      "precision_at_top_10_percent": 0.2727272727272727,
+      "ndcg_at_top_10_percent": 0.8007694755300727,
+      "top_10_percent_row_count": 110,
+      "top_10_percent_positive_count": 30
+    },
+    "elapsed_seconds": 916.5940000000119,
+    "model_file": "xgboost_pseudo_huber.joblib",
+    "model_sha256": "d9fd8900808fc024b2d763aa9bf3b5f530fe1108ea0b05e082367fd6b82ec91b"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26100-SP0"
+  }
+}

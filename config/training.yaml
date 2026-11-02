@@ -1,0 +1,20 @@
+# Training baseline from SDD Draft 0.1. Thresholds are selected during training.
+data_path: Database/bankrupt_data.csv
+random_seed: 42
+split:
+  strategy: stratified
+  train: 0.64
+  validation: 0.16
+  test: 0.20
+search:
+  n_iter: 30
+  cv_folds: 5
+  scoring: average_precision
+calibration:
+  method: sigmoid
+  cv_folds: 5
+models:
+  - logistic_regression
+  - xgboost
+use_smote: false
+test_only: false

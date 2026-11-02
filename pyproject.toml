@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bankruptcy-prediction"
+version = "0.1.0"
+description = "Local MVP for company bankruptcy risk analysis"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+bankruptcy-prediction = "bankruptcy_prediction.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["bankruptcy_prediction"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

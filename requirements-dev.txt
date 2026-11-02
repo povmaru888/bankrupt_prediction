@@ -1,0 +1,6 @@
+# Development and test dependencies. Runtime dependencies are shared with the application.
+-r requirements.txt
+pytest==9.1.1
+pytest-cov==7.0.0
+ruff==0.16.8
+httpx==0.28.1
