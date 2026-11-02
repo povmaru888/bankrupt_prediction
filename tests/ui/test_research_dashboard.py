@@ -57,11 +57,11 @@ def test_dashboard_shows_baseline_and_original_charts_when_accessible(tmp_path):
     comparison_chart_dir = tmp_path / "experiments" / "posthoc-final-test-comparison"
     comparison_chart_dir.mkdir(parents=True)
     (comparison_chart_dir / "precision_recall_comparison.png").write_bytes(b"PNG fixture")
+    (comparison_chart_dir / "confusion_matrix_xgboost.png").write_bytes(b"PNG fixture")
     chart_dir = tmp_path / "models" / CANDIDATE / "charts"
     chart_dir.mkdir(parents=True)
     for name in (
         "calibration.png",
-        "confusion_matrix.png",
         "feature_importance.png",
     ):
         (chart_dir / name).write_bytes(b"PNG fixture")

@@ -21,6 +21,21 @@
     "logistic_average_precision": 0.3255132098622123,
     "chart_sha256": "c6bb09207b710e7530c2d4783c333c94c08afc50e3782fa843c1af22e258420f"
   },
+  "xgboost_confusion_matrix_chart": {
+    "partition": "held_out_final_test",
+    "threshold": 0.04979437942223049,
+    "matrix": [
+      [
+        1262,
+        58
+      ],
+      [
+        15,
+        29
+      ]
+    ],
+    "chart_sha256": "48375c3c81d0aba7b73025ab1f4f3a95e0a6008fd4f9dd2301e28c951d22871b"
+  },
   "xgboost_binary": {
     "model_version": "candidate-20261022T105726Z-155ceb0b",
     "metrics": {

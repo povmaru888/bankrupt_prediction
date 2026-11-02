@@ -19,7 +19,10 @@ CHARTS = (
         "experiments/posthoc-final-test-comparison/precision_recall_comparison.png",
     ),
     ("Calibration · XGBoost", f"models/{CANDIDATE}/charts/calibration.png"),
-    ("Confusion Matrix · XGBoost", f"models/{CANDIDATE}/charts/confusion_matrix.png"),
+    (
+        "Confusion Matrix · XGBoost",
+        "experiments/posthoc-final-test-comparison/confusion_matrix_xgboost.png",
+    ),
     ("SHAP Feature Importance · XGBoost", f"models/{CANDIDATE}/charts/feature_importance.png"),
 )
 

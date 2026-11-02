@@ -30,11 +30,18 @@ def main() -> int:
             / "precision_recall_comparison.png"
         ),
     )
+    parser.add_argument(
+        "--confusion-chart-output",
+        default=str(
+            root / "experiments" / "posthoc-final-test-comparison" / "confusion_matrix_xgboost.png"
+        ),
+    )
     args = parser.parse_args()
     result = evaluate_posthoc_logistic(
         args.data,
         args.candidate,
         chart_output=args.chart_output,
+        confusion_chart_output=args.confusion_chart_output,
     )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)

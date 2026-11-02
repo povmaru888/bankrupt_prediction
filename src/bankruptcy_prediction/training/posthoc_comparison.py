@@ -12,6 +12,7 @@ from typing import Any
 import joblib
 import matplotlib
 import numpy as np
+from matplotlib.patches import Rectangle
 from sklearn.metrics import precision_recall_curve
 from sklearn.preprocessing import RobustScaler, StandardScaler
 
@@ -128,10 +129,91 @@ def plot_precision_recall_comparison(
     return output
 
 
+def plot_labeled_confusion_matrix(
+    matrix: Any,
+    threshold: float,
+    output_path: str | Path,
+) -> Path:
+    """Render an equal-area, explicitly labeled binary confusion matrix."""
+    values = np.asarray(matrix, dtype=int)
+    if values.shape != (2, 2) or np.any(values < 0):
+        raise ValueError("confusion matrix must be a non-negative 2x2 matrix")
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, axis = plt.subplots(figsize=(8.6, 5.8))
+    fig.subplots_adjust(left=0.12, right=0.74, top=0.80, bottom=0.18)
+    labels = (("TN", "FP"), ("FN", "TP"))
+    fills = (("#E8F1FC", "#FFF0E5"), ("#FFF0E5", "#E8F1FC"))
+    accents = (("#0B3A75", "#A14A22"), ("#A14A22", "#0B3A75"))
+    for row in range(2):
+        for column in range(2):
+            axis.add_patch(
+                Rectangle(
+                    (column - 0.5, row - 0.5),
+                    1,
+                    1,
+                    facecolor=fills[row][column],
+                    edgecolor="#1F2937",
+                    linewidth=2.5,
+                )
+            )
+            axis.text(
+                column,
+                row - 0.08,
+                labels[row][column],
+                ha="center",
+                va="center",
+                fontsize=19,
+                fontweight="bold",
+                color=accents[row][column],
+            )
+            axis.text(
+                column,
+                row + 0.20,
+                f"{values[row, column]:,}",
+                ha="center",
+                va="center",
+                fontsize=16,
+                color="#111827",
+            )
+
+    axis.set_xlim(-0.5, 1.5)
+    axis.set_ylim(1.5, -0.5)
+    axis.set_aspect("equal")
+    axis.set_xticks((0, 1), labels=("0", "1"), fontsize=15)
+    axis.set_yticks((0, 1), labels=("0", "1"), fontsize=15)
+    axis.xaxis.tick_top()
+    axis.xaxis.set_label_position("bottom")
+    axis.tick_params(length=0, pad=9)
+    axis.set_xlabel("Predicted label", fontsize=15, labelpad=22)
+    axis.set_ylabel("Actual label", fontsize=15, labelpad=12)
+    for spine in axis.spines.values():
+        spine.set_visible(False)
+
+    fig.suptitle("Confusion Matrix · XGBoost", fontsize=20, fontweight="semibold", y=0.95)
+    axis.set_title(
+        f"Held-out final test · threshold = {threshold:.4f}",
+        fontsize=11,
+        color="#4B5563",
+        pad=34,
+    )
+    fig.text(0.78, 0.59, "0 : Negative", fontsize=15, color="#111827")
+    fig.text(0.78, 0.51, "1 : Positive", fontsize=15, color="#111827")
+    fig.text(0.78, 0.38, "TN  True negative", fontsize=10, color="#0B3A75")
+    fig.text(0.78, 0.33, "FP  False positive", fontsize=10, color="#A14A22")
+    fig.text(0.78, 0.28, "FN  False negative", fontsize=10, color="#A14A22")
+    fig.text(0.78, 0.23, "TP  True positive", fontsize=10, color="#0B3A75")
+    fig.savefig(output, dpi=180, facecolor="white")
+    plt.close(fig)
+    return output
+
+
 def evaluate_posthoc_logistic(
     data_path: str | Path,
     candidate_dir: str | Path,
     chart_output: str | Path | None = None,
+    confusion_chart_output: str | Path | None = None,
 ) -> dict[str, Any]:
     """Rebuild the persisted LR winner and evaluate the original final-test partition once."""
     candidate = Path(candidate_dir)
@@ -212,6 +294,21 @@ def evaluate_posthoc_logistic(
         )
         chart_evidence["chart_sha256"] = hashlib.sha256(chart_path.read_bytes()).hexdigest()
 
+    confusion_evidence: dict[str, Any] = {
+        "partition": "held_out_final_test",
+        "threshold": float(xgboost_metrics["threshold"]),
+        "matrix": xgboost_metrics["confusion_matrix"],
+    }
+    if confusion_chart_output is not None:
+        confusion_chart_path = plot_labeled_confusion_matrix(
+            xgboost_metrics["confusion_matrix"],
+            float(xgboost_metrics["threshold"]),
+            confusion_chart_output,
+        )
+        confusion_evidence["chart_sha256"] = hashlib.sha256(
+            confusion_chart_path.read_bytes()
+        ).hexdigest()
+
     serializable_parameters = dict(persisted["best_parameters"])
     return {
         "comparison_type": "posthoc_final_test_comparison",
@@ -230,6 +327,7 @@ def evaluate_posthoc_logistic(
             "test_row_count": len(X_test),
         },
         "precision_recall_comparison": chart_evidence,
+        "xgboost_confusion_matrix_chart": confusion_evidence,
         "xgboost_binary": {
             "model_version": manifest["version"],
             "metrics": xgboost_metrics,

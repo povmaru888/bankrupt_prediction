@@ -607,6 +607,7 @@ P4-07 -> P5-05 -> P5-07 -> P5-08 -> P5-10 -> Release
 - [x] H6 將 Training CV AP 與 Validation AP 拆成兩張雙模型比較圖並移除原合併圖。
 - [x] H7 美化 AP 圖表：XGBoost 深藍、細長柱、統一尺度與柱頂數值。
 - [x] H8 以相同 held-out final test 重繪 Logistic Regression 與 XGBoost PR curve，標示 AP、盛行率基準、樣本數及事後授權比較，並通過完整回歸測試（240 passed）。
+- [x] H9 依 TN／FP／FN／TP 格式重繪 XGBoost confusion matrix，標示實際數量、類別定義、final-test 與門檻，並通過完整回歸測試（242 passed）。
 
 ### [x] P4-01 建立 Streamlit 應用殼層與 API Client
 

@@ -32,3 +32,19 @@ def test_precision_recall_comparison_chart_is_written(tmp_path: Path):
         tmp_path / "comparison.png",
     )
     assert output.read_bytes().startswith(b"\x89PNG")
+
+
+def test_labeled_confusion_matrix_chart_is_written(tmp_path: Path):
+    output = posthoc_comparison.plot_labeled_confusion_matrix(
+        [[1262, 58], [15, 29]],
+        0.049794,
+        tmp_path / "confusion.png",
+    )
+    assert output.read_bytes().startswith(b"\x89PNG")
+
+
+def test_labeled_confusion_matrix_rejects_invalid_shape(tmp_path: Path):
+    with pytest.raises(ValueError, match="2x2"):
+        posthoc_comparison.plot_labeled_confusion_matrix(
+            [[1, 2, 3]], 0.5, tmp_path / "confusion.png"
+        )
