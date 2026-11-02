@@ -12,6 +12,7 @@ dist/
 *.egg-info/
 
 # Request-scoped files, generated previews, and local logs
+tmp/uploads/
 tmp/
 logs/*
 !logs/.gitkeep

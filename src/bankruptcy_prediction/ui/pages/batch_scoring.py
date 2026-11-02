@@ -5,7 +5,11 @@ from __future__ import annotations
 from typing import Any
 
 from bankruptcy_prediction.ui.api_client import ApiClient, ApiClientError
-from bankruptcy_prediction.ui.session_state import save_score_session
+from bankruptcy_prediction.ui.session_state import (
+    clear_score_session,
+    get_score_session,
+    save_score_session,
+)
 
 UPLOAD_RULES = (
     "上傳限制：CSV 不超過 10 MB、最多 10,000 列，且必須包含正規化後的 95 個特徵。"
@@ -14,7 +18,11 @@ UPLOAD_RULES = (
 
 
 def render_batch_scoring(
-    st: Any, client: ApiClient, *, model_loaded: bool
+    st: Any,
+    client: ApiClient,
+    *,
+    model_loaded: bool,
+    default_threshold: float = 0.5,
 ) -> dict[str, Any] | None:
     st.subheader("批次評分")
     st.info(UPLOAD_RULES)
@@ -23,13 +31,29 @@ def render_batch_scoring(
         st.button("送出評分", disabled=True)
         return None
     uploaded = st.file_uploader("選擇 CSV", type=["csv"], disabled=not model_loaded)
-    threshold = st.slider("情境門檻", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
-    if uploaded is None or not st.button("送出評分", disabled=uploaded is None):
+    threshold = st.slider(
+        "初始情境門檻",
+        min_value=0.0,
+        max_value=1.0,
+        value=float(default_threshold),
+        step=0.000001,
+        format="%.6f",
+        key="upload_threshold",
+    )
+    if uploaded is None:
+        return None
+    uploaded_bytes = uploaded.getvalue()
+    uploaded_name = getattr(uploaded, "name", "input.csv")
+    previous = get_score_session(st.session_state)
+    if previous is not None and (previous[1] != uploaded_bytes or previous[2] != uploaded_name):
+        clear_score_session(st.session_state)
+        st.info("已選擇新的檔案；送出評分前不顯示上一批結果。")
+    if not st.button("送出評分", disabled=False):
         return None
     try:
         payload = client.score(
-            uploaded.getvalue(),
-            filename=getattr(uploaded, "name", "input.csv"),
+            uploaded_bytes,
+            filename=uploaded_name,
             threshold=threshold,
         )
     except ApiClientError as exc:
@@ -40,8 +64,8 @@ def render_batch_scoring(
     save_score_session(
         st.session_state,
         payload,
-        uploaded.getvalue(),
-        getattr(uploaded, "name", "input.csv"),
+        uploaded_bytes,
+        uploaded_name,
     )
     summary = payload.get("summary", {})
     st.write(

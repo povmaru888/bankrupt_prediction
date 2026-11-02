@@ -4,7 +4,7 @@
 
 1. 確認 `.venv` 已安裝依賴，並在專案根目錄執行 `scripts\start_api.ps1`。
 2. 另開 PowerShell 執行 `scripts\start_ui.ps1`。
-3. API 固定綁定 `127.0.0.1:8000`，Streamlit 固定綁定 `127.0.0.1:8501`；不對外開放。
+3. API 固定綁定 `127.0.0.1:8000`，Streamlit 固定綁定 `127.0.0.1:8502`；不對外開放。
 4. 以 `GET http://127.0.0.1:8000/health` 確認服務狀態。
 
 ## 常見故障

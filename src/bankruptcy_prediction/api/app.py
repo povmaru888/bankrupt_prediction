@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Callable
+from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -23,6 +25,25 @@ from bankruptcy_prediction.data.record_ids import RecordIdError
 from bankruptcy_prediction.data.schema_validator import FileSchemaError
 from bankruptcy_prediction.model_registry.registry import ActiveModelUnavailable
 from bankruptcy_prediction.scoring.response_formatter import ResponseFormatError
+from bankruptcy_prediction.settings import AppSettings, load_settings
+
+
+def _project_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def load_runtime_settings(project_root: str | Path | None = None) -> AppSettings:
+    """Load local settings and anchor every service directory to the project root."""
+    root = Path(project_root).resolve() if project_root is not None else _project_root()
+    settings = load_settings(root / "config" / "training.yaml", root / "config" / "service.yaml")
+    service = settings.service
+    anchored_service = replace(
+        service,
+        models_dir=str((root / service.models_dir).resolve()),
+        logs_dir=str((root / service.logs_dir).resolve()),
+        temp_dir=str((root / service.temp_dir).resolve()),
+    )
+    return replace(settings, service=anchored_service)
 
 
 def create_app(settings: Any, *, model_loader: Callable[[str], Any] | None = None) -> FastAPI:
@@ -63,3 +84,8 @@ def create_app(settings: Any, *, model_loader: Callable[[str], Any] | None = Non
         return {"status": "ok"}
 
     return app
+
+
+def create_runtime_app() -> FastAPI:
+    """Zero-argument Uvicorn factory for the local production process."""
+    return create_app(load_runtime_settings())

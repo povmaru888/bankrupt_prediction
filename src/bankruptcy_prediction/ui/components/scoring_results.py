@@ -30,7 +30,8 @@ def render_scoring_results(
         min_value=0.0,
         max_value=1.0,
         value=original_threshold,
-        step=0.01,
+        step=0.000001,
+        format="%.6f",
         key="result_threshold",
     )
     if threshold != original_threshold and csv_bytes is not None:
@@ -48,6 +49,7 @@ def render_scoring_results(
     )
     top_ten = successful[successful["top_10_percent_flag"]] if not successful.empty else successful
     st.write(f"成功列：{len(successful)}；高風險列：{len(high_risk)}")
+    st.caption(f"目前結果使用門檻：{float(current.get('summary', {}).get('threshold_used', threshold)):.6f}")
     if not successful.empty:
         st.bar_chart(successful["confidence_score"])
     st.dataframe(high_risk)

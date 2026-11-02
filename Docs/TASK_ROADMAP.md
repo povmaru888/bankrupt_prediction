@@ -597,6 +597,17 @@ P4-07 -> P5-05 -> P5-07 -> P5-08 -> P5-10 -> Release
 
 ## 6. Phase 4 Streamlit 使用者介面
 
+### Dashboard hotfix（2026-11-02）
+
+- [x] H1 修復 Streamlit 啟動路徑與獨立入口。
+- [x] H2 修復 FastAPI 啟動設定並校驗、啟用既有模型。
+- [x] H3 以實際成果檔恢復研究資料與圖表。
+- [x] H4 保留評分結果並完成端到端驗收。
+- [x] H5 依明確授權補評估 Logistic Regression final test，並顯示雙模型八指標比較。
+- [x] H6 將 Training CV AP 與 Validation AP 拆成兩張雙模型比較圖並移除原合併圖。
+- [x] H7 美化 AP 圖表：XGBoost 深藍、細長柱、統一尺度與柱頂數值。
+- [x] H8 以相同 held-out final test 重繪 Logistic Regression 與 XGBoost PR curve，標示 AP、盛行率基準、樣本數及事後授權比較，並通過完整回歸測試（240 passed）。
+
 ### [x] P4-01 建立 Streamlit 應用殼層與 API Client
 
 - **目標**：`src/bankruptcy_prediction/ui/app.py`、`src/bankruptcy_prediction/ui/api_client.py`
@@ -800,11 +811,11 @@ P4-07 -> P5-05 -> P5-07 -> P5-08 -> P5-10 -> Release
 - **相依**：P3-08、P3-09、P4-07、P5-07
 - **輸入與輸出**：輸入虛擬環境、設定與 models root；輸出依序檢查模型、啟動 FastAPI、啟動 Streamlit 及故障排除步驟。
 - **驗收準則**：
-  - 啟動腳本明確綁定 `127.0.0.1`，FastAPI 預設 port 8000、Streamlit 預設 port 8501。
+  - 啟動腳本明確綁定 `127.0.0.1`，FastAPI 預設 port 8000、Streamlit 預設 port 8502。
   - Runbook 涵蓋無模型、模型損壞、port 佔用、回滾、日誌位置與暫存清理。
   - 測試：`tests/test_launch_scripts.py` 驗證參數、啟動順序與無 `0.0.0.0`。
 - **狀態**：已完成（2026-10-22），`PYTHONPATH=src .venv\\Scripts\\python.exe -m pytest -q tests/test_launch_scripts.py` 2 passed；全套 `pytest -q` 222 passed；`ruff check src tests` 通過。
-- **更動重點**：新增 `scripts/start_api.ps1`、`scripts/start_ui.ps1` 與 `docs/RUNBOOK.md`；啟動固定 loopback、API 8000／UI 8501，並記錄模型啟用／回滾、checksum、port、無模型與暫存清理處置。
+- **更動重點**：新增 `scripts/start_api.ps1`、`scripts/start_ui.ps1` 與 `docs/RUNBOOK.md`；啟動固定 loopback、API 8000／UI 8502，並記錄模型啟用／回滾、checksum、port、無模型與暫存清理處置。
 - **技術注意事項**：MVP 不建立 Windows Service、容器、雲端部署或自動對外開放防火牆。
 
 ### [~] P5-10 完成 Release 驗收與需求追溯
