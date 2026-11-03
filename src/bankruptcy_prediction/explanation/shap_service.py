@@ -155,6 +155,44 @@ def _tree_shap(classifier: Any, values: np.ndarray) -> np.ndarray:
     return _normalize_shap_values(result, len(values), values.shape[1])
 
 
+def mean_absolute_shap_importance(
+    model_family: Literal["logistic_regression", "xgboost"] | str,
+    model: Any,
+    X: pd.DataFrame,
+) -> dict[str, float]:
+    """Return full-feature mean absolute SHAP values across calibrated estimators."""
+    if model_family not in SUPPORTED_MODEL_FAMILIES:
+        raise ValueError(f"unsupported model_family: {model_family}")
+    if not isinstance(X, pd.DataFrame) or X.empty:
+        raise TypeError("X must be a non-empty pandas DataFrame with named features")
+    if X.columns.has_duplicates or any(
+        not isinstance(name, str) or not name.strip() for name in X.columns
+    ):
+        raise ValueError("X feature names must be unique non-empty strings")
+    if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
+        raise ValueError("X features must be numeric")
+
+    per_estimator_values: list[np.ndarray] = []
+    expected_names: tuple[str, ...] | None = None
+    for estimator in _estimators(model):
+        classifier, transformed, names = _prepare(estimator, X)
+        if expected_names is None:
+            expected_names = names
+        elif names != expected_names:
+            raise ValueError("calibrated estimators have inconsistent feature names or order")
+        values = (
+            _linear_shap(classifier, transformed)
+            if model_family == "logistic_regression"
+            else _tree_shap(classifier, transformed)
+        )
+        per_estimator_values.append(values)
+
+    assert expected_names is not None
+    contributions = np.mean(np.stack(per_estimator_values, axis=0), axis=0)
+    importance = np.mean(np.abs(contributions), axis=0)
+    return {name: float(value) for name, value in zip(expected_names, importance, strict=True)}
+
+
 def explain(
     model_family: Literal["logistic_regression", "xgboost"] | str,
     model: Any,

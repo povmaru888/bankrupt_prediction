@@ -45,6 +45,24 @@ def main() -> int:
             / "calibration_xgboost_detailed.png"
         ),
     )
+    parser.add_argument(
+        "--shap-top-chart-output",
+        default=str(
+            root
+            / "experiments"
+            / "posthoc-final-test-comparison"
+            / "shap_feature_importance_top10.png"
+        ),
+    )
+    parser.add_argument(
+        "--shap-last-chart-output",
+        default=str(
+            root
+            / "experiments"
+            / "posthoc-final-test-comparison"
+            / "shap_feature_importance_last10.png"
+        ),
+    )
     args = parser.parse_args()
     result = evaluate_posthoc_logistic(
         args.data,
@@ -52,6 +70,8 @@ def main() -> int:
         chart_output=args.chart_output,
         confusion_chart_output=args.confusion_chart_output,
         calibration_chart_output=args.calibration_chart_output,
+        shap_top_chart_output=args.shap_top_chart_output,
+        shap_last_chart_output=args.shap_last_chart_output,
     )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)

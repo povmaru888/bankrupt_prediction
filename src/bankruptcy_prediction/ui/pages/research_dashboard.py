@@ -26,7 +26,75 @@ CHARTS = (
         "Confusion Matrix · XGBoost",
         "experiments/posthoc-final-test-comparison/confusion_matrix_xgboost.png",
     ),
-    ("SHAP Feature Importance · XGBoost", f"models/{CANDIDATE}/charts/feature_importance.png"),
+    (
+        "SHAP Feature Importance · Top 10",
+        "experiments/posthoc-final-test-comparison/shap_feature_importance_top10.png",
+    ),
+    (
+        "SHAP Feature Importance · Last 10",
+        "experiments/posthoc-final-test-comparison/shap_feature_importance_last10.png",
+    ),
+)
+CHART_ROWS = (CHARTS[:2], CHARTS[2:3], CHARTS[3:])
+
+# Rank order comes from the frozen candidate's mean-absolute-SHAP chart.
+# This is a bilingual glossary, not a claim about SHAP sign or causality.
+SHAP_TOP_FEATURES = (
+    (1, "Quick Ratio", "速動比率", "不靠出售存貨，手邊較容易變現的資產夠不夠償還短期債務？"),
+    (
+        2,
+        "Total debt/Total net worth",
+        "總負債／股東權益比",
+        "公司背的債相對於股東自己的本錢有多少？",
+    ),
+    (
+        3,
+        "Persistent EPS in the Last Four Seasons",
+        "近四季每股盈餘",
+        "最近四季平均每一股能賺多少，幫助觀察企業的獲利表現。",
+    ),
+    (
+        4,
+        "Non-industry income and expenditure/revenue",
+        "業外收支占營收比重",
+        "投資、匯兌或處分資產等本業以外的淨收支，和營業收入相比占多少？",
+    ),
+    (
+        5,
+        "Allocation rate per person",
+        "每位員工分攤固定資產",
+        "每位員工平均對應多少機器、設備或廠房等固定資產；不是薪資分配率。",
+    ),
+    (
+        6,
+        "ROA(C) before interest and depreciation before interest",
+        "資產報酬率（C，息折前口徑）",
+        "公司的資產產生獲利的能力如何？這是排除部分利息、折舊影響的資產報酬指標。",
+    ),
+    (
+        7,
+        "Interest-bearing debt interest rate",
+        "有息負債相關比率",
+        "與需要付利息的借款有關；原資料欄位對照為「有息負債／股東權益」，不能直接當銀行貸款利率。",
+    ),
+    (
+        8,
+        "Borrowing dependency",
+        "借款依賴／有息負債成本",
+        "觀察借款融資負擔；原資料欄位對照為「有息負債成本」，不宜只按名稱解讀成借款占比。",
+    ),
+    (
+        9,
+        "Continuous interest rate (after tax)",
+        "經常性稅後淨利率",
+        "排除處分資產等一次性損益後，企業每一元營收大約留下多少淨利？這不是存款利率。",
+    ),
+    (
+        10,
+        "Continuous Net Profit Growth Rate",
+        "經常性淨利成長率",
+        "不靠賣資產等一次性收益，公司的淨利是在成長還是衰退？",
+    ),
 )
 
 
@@ -319,9 +387,14 @@ def render_research_dashboard(st: Any, root: Path = PROJECT_ROOT) -> None:
         st.warning(str(exc))
 
     st.markdown("### Evaluation charts & SHAP explanations")
-    for index in range(0, len(CHARTS), 2):
-        cols = st.columns(2)
-        for col, (name, filename) in zip(cols, CHARTS[index : index + 2], strict=True):
+    for chart_row in CHART_ROWS:
+        if len(chart_row) == 1:
+            # A centered half-width column keeps a standalone square matrix at the
+            # same visual scale as either chart in the surrounding two-column rows.
+            cols = (st.columns([1, 2, 1])[1],)
+        else:
+            cols = st.columns(len(chart_row))
+        for col, (name, filename) in zip(cols, chart_row, strict=True):
             col.markdown(f"**{name}**")
             image_path = root / filename
             try:
@@ -343,6 +416,25 @@ def render_research_dashboard(st: Any, root: Path = PROJECT_ROOT) -> None:
                 col.warning(f"成果圖檔無法讀取：{filename}")
     st.caption(
         "PR curve 為事後授權比較：兩模型使用同一份 held-out final test（n=1,364；正例=44）；"
-        "AP 為曲線摘要，虛線為正例盛行率基準。其餘三圖仍屬 XGBoost active candidate。"
+        "AP 為曲線摘要，虛線為正例盛行率基準；其餘圖表仍屬 XGBoost active candidate。"
+    )
+    st.caption(
+        "SHAP Top 10／Last 10 使用相同 validation split，對五個校準基模型的完整特徵 SHAP 取平均絕對值；"
+        "Last 10 代表本資料與模型下平均貢獻最低，不代表因果無關或永遠不重要。"
+    )
+    st.markdown("#### SHAP Top 10｜中英文白話解讀")
+    st.caption("排名依目前 XGBoost 候選模型的平均絕對 SHAP 貢獻，由高至低。")
+    st.dataframe(
+        pd.DataFrame(
+            SHAP_TOP_FEATURES,
+            columns=["重要性排名", "English feature", "中文名稱", "白話解釋"],
+        ),
+        width="stretch",
+        hide_index=True,
+    )
+    st.caption(
+        "長條越長，代表平均影響力越大；但這張圖不顯示影響方向。"
+        "不能由此判斷某指標提高一定會讓風險上升或下降。"
+        "少數原始英文欄名與資料字典的實際定義不同，已在中文說明中註明。"
     )
     st.caption("模型信心分數僅供分析優先順序使用；SHAP 是模型貢獻，不代表因果關係。")

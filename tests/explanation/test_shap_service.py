@@ -10,7 +10,7 @@ import pytest
 from sklearn.pipeline import Pipeline
 
 from bankruptcy_prediction.explanation import shap_service
-from bankruptcy_prediction.explanation.shap_service import explain
+from bankruptcy_prediction.explanation.shap_service import explain, mean_absolute_shap_importance
 
 
 class _Selector:
@@ -117,6 +117,14 @@ def test_calibrated_ensemble_averages_base_explanations() -> None:
 
     assert _LinearExplainer.calls == 2
     assert result.rows[0].positive_factors[0].contribution == 5
+
+
+def test_mean_absolute_importance_uses_every_feature() -> None:
+    frame = pd.DataFrame([[1, 2, 3, 4, 5, 6]], columns=list("abcdef"))
+
+    importance = mean_absolute_shap_importance("xgboost", _pipeline(_Tree()), frame)
+
+    assert importance == {"a": 1.0, "b": 2.0, "c": 3.0, "d": 3.0, "e": 2.0, "f": 1.0}
 
 
 @pytest.mark.parametrize(

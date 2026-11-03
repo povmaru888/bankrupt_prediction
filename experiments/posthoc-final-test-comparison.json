@@ -93,6 +93,193 @@
     },
     "chart_sha256": "d3ae5e3f98c72fa549d249cef5112d9d3a16b56dbced4aa905001ca1a5fff9c5"
   },
+  "xgboost_shap_importance": {
+    "partition": "validation",
+    "sample_count": 1091,
+    "aggregation": "mean absolute SHAP over all features and five calibrated base estimators",
+    "non_causal": true,
+    "feature_count": 92,
+    "importance": {
+      "ROA(C) before interest and depreciation before interest": 0.2905415249952263,
+      "ROA(A) before interest and % after tax": 0.02548396034143488,
+      "ROA(B) before interest and depreciation after tax": 0.15900493180066433,
+      "Operating Gross Margin": 0.06511984895585812,
+      "Realized Sales Gross Margin": 0.028029168070024816,
+      "Operating Profit Rate": 0.048870863212215926,
+      "Pre-tax net Interest Rate": 0.0574817077900258,
+      "After-tax net Interest Rate": 0.029112220045751033,
+      "Non-industry income and expenditure/revenue": 0.3737735046631222,
+      "Continuous interest rate (after tax)": 0.2623121862393535,
+      "Operating Expense Rate": 0.07567281236509127,
+      "Research and development expense rate": 0.10239483820702418,
+      "Cash flow rate": 0.059710546834061795,
+      "Interest-bearing debt interest rate": 0.30336040757337396,
+      "Tax rate (A)": 0.03191733461989613,
+      "Net Value Per Share (B)": 0.14760985180236655,
+      "Net Value Per Share (A)": 0.05746715073298219,
+      "Net Value Per Share (C)": 0.01675913869605642,
+      "Persistent EPS in the Last Four Seasons": 0.3698228727144342,
+      "Cash Flow Per Share": 0.0691109984135004,
+      "Revenue Per Share (Yuan ¥)": 0.04416888968709855,
+      "Operating Profit Per Share (Yuan ¥)": 0.017957719964022765,
+      "Per Share Net profit before tax (Yuan ¥)": 0.0333301788519031,
+      "Realized Sales Gross Profit Growth Rate": 0.055239404705010944,
+      "Operating Profit Growth Rate": 0.053081379669875244,
+      "After-tax Net Profit Growth Rate": 0.02681463983824885,
+      "Regular Net Profit Growth Rate": 0.013558426059589145,
+      "Continuous Net Profit Growth Rate": 0.2032844201385898,
+      "Total Asset Growth Rate": 0.12334028020559891,
+      "Net Value Growth Rate": 0.17757906132564616,
+      "Total Asset Return Growth Rate Ratio": 0.059934784817057135,
+      "Cash Reinvestment %": 0.05074417601681257,
+      "Current Ratio": 0.0381474460373707,
+      "Quick Ratio": 0.5188005382673421,
+      "Interest Expense Ratio": 0.07051980654452622,
+      "Total debt/Total net worth": 0.466077883469566,
+      "Debt ratio %": 0.1479401180055795,
+      "Net worth/Assets": 0.09912626670490517,
+      "Long-term fund suitability ratio (A)": 0.09364625426984531,
+      "Borrowing dependency": 0.3021005615043061,
+      "Contingent liabilities/Net worth": 0.030053033099066352,
+      "Operating profit/Paid-in capital": 0.010276230871305,
+      "Net profit before tax/Paid-in capital": 0.03742641088735389,
+      "Inventory and accounts receivable/Net value": 0.02373933440694309,
+      "Total Asset Turnover": 0.04160896185689993,
+      "Accounts Receivable Turnover": 0.20206876372846805,
+      "Average Collection Days": 0.07148835074255913,
+      "Inventory Turnover Rate (times)": 0.1026696286367338,
+      "Fixed Assets Turnover Frequency": 0.11306932361092288,
+      "Net Worth Turnover Rate (times)": 0.024702394726994214,
+      "Revenue per person": 0.09739433598626887,
+      "Operating profit per person": 0.06914467257786329,
+      "Allocation rate per person": 0.3376201591900606,
+      "Working Capital to Total Assets": 0.018868254335506485,
+      "Quick Assets/Total Assets": 0.06454364721541832,
+      "Current Assets/Total Assets": 0.05364289778180509,
+      "Cash/Total Assets": 0.11224663502431186,
+      "Quick Assets/Current Liability": 0.02528307102222325,
+      "Cash/Current Liability": 0.08329326175503257,
+      "Current Liability to Assets": 0.08849938751011903,
+      "Operating Funds to Liability": 0.041922677438750035,
+      "Inventory/Working Capital": 0.08671748989819522,
+      "Inventory/Current Liability": 0.05125824451900308,
+      "Current Liabilities/Liability": 0.0570313256404386,
+      "Working Capital/Equity": 0.021566006372039138,
+      "Current Liabilities/Equity": 0.1101058001257572,
+      "Long-term Liability to Current Assets": 0.035615568442293806,
+      "Retained Earnings to Total Assets": 0.18555607084879486,
+      "Total income/Total expense": 0.112638933407293,
+      "Total expense/Assets": 0.08381636268845709,
+      "Current Asset Turnover Rate": 0.07210112953962895,
+      "Quick Asset Turnover Rate": 0.07544248917058943,
+      "Working capitcal Turnover Rate": 0.03710579449074759,
+      "Cash Turnover Rate": 0.11321972774946489,
+      "Cash Flow to Sales": 0.08140479012193365,
+      "Fixed Assets to Assets": 0.12626337400474208,
+      "Equity to Long-term Liability": 0.10549161089081387,
+      "Cash Flow to Total Assets": 0.052078857732819166,
+      "Cash Flow to Liability": 0.06462496899715889,
+      "CFO to Assets": 0.03598169629097014,
+      "Cash Flow to Equity": 0.07818404394821833,
+      "Current Liability to Current Assets": 0.006809959030018658,
+      "Liability-Assets Flag": 0.0,
+      "Net Income to Total Assets": 0.09953633853157916,
+      "Total assets to GNP price": 0.06522837256158873,
+      "No-credit Interval": 0.038248807028022705,
+      "Gross Profit to Sales": 0.010403275504478728,
+      "Net Income to Stockholder's Equity": 0.052113139169731676,
+      "Liability to Equity": 0.04604228581735226,
+      "Degree of Financial Leverage (DFL)": 0.06746356425562838,
+      "Interest Coverage Ratio (Interest expense to EBIT)": 0.04257808079672622,
+      "Equity to Liability": 0.017881960165077378
+    },
+    "top_10": [
+      {
+        "feature_name": "Quick Ratio",
+        "mean_absolute_shap": 0.5188005382673421
+      },
+      {
+        "feature_name": "Total debt/Total net worth",
+        "mean_absolute_shap": 0.466077883469566
+      },
+      {
+        "feature_name": "Non-industry income and expenditure/revenue",
+        "mean_absolute_shap": 0.3737735046631222
+      },
+      {
+        "feature_name": "Persistent EPS in the Last Four Seasons",
+        "mean_absolute_shap": 0.3698228727144342
+      },
+      {
+        "feature_name": "Allocation rate per person",
+        "mean_absolute_shap": 0.3376201591900606
+      },
+      {
+        "feature_name": "Interest-bearing debt interest rate",
+        "mean_absolute_shap": 0.30336040757337396
+      },
+      {
+        "feature_name": "Borrowing dependency",
+        "mean_absolute_shap": 0.3021005615043061
+      },
+      {
+        "feature_name": "ROA(C) before interest and depreciation before interest",
+        "mean_absolute_shap": 0.2905415249952263
+      },
+      {
+        "feature_name": "Continuous interest rate (after tax)",
+        "mean_absolute_shap": 0.2623121862393535
+      },
+      {
+        "feature_name": "Continuous Net Profit Growth Rate",
+        "mean_absolute_shap": 0.2032844201385898
+      }
+    ],
+    "last_10": [
+      {
+        "feature_name": "Liability-Assets Flag",
+        "mean_absolute_shap": 0.0
+      },
+      {
+        "feature_name": "Current Liability to Current Assets",
+        "mean_absolute_shap": 0.006809959030018658
+      },
+      {
+        "feature_name": "Operating profit/Paid-in capital",
+        "mean_absolute_shap": 0.010276230871305
+      },
+      {
+        "feature_name": "Gross Profit to Sales",
+        "mean_absolute_shap": 0.010403275504478728
+      },
+      {
+        "feature_name": "Regular Net Profit Growth Rate",
+        "mean_absolute_shap": 0.013558426059589145
+      },
+      {
+        "feature_name": "Net Value Per Share (C)",
+        "mean_absolute_shap": 0.01675913869605642
+      },
+      {
+        "feature_name": "Equity to Liability",
+        "mean_absolute_shap": 0.017881960165077378
+      },
+      {
+        "feature_name": "Operating Profit Per Share (Yuan ¥)",
+        "mean_absolute_shap": 0.017957719964022765
+      },
+      {
+        "feature_name": "Working Capital to Total Assets",
+        "mean_absolute_shap": 0.018868254335506485
+      },
+      {
+        "feature_name": "Working Capital/Equity",
+        "mean_absolute_shap": 0.021566006372039138
+      }
+    ],
+    "top_chart_sha256": "46dc032d71c32e6db2929bffc97c9bc8456c0b2d125a47fe7a0a3f6e5d336590",
+    "last_chart_sha256": "f5c60ed00d3e5f008db5de5de7f5a5975bc097abdd2441c26c4ecb7a6a109484"
+  },
   "xgboost_binary": {
     "model_version": "candidate-20261022T105726Z-155ceb0b",
     "metrics": {

@@ -20,7 +20,9 @@ class FakeStreamlit:
     def __init__(self):
         self.calls = []
 
-    def columns(self, count):
+    def columns(self, spec):
+        self.calls.append(("columns", (spec,), {}))
+        count = spec if isinstance(spec, int) else len(spec)
         return [self] * count
 
     def __getattr__(self, name):
@@ -59,13 +61,14 @@ def test_dashboard_shows_baseline_and_original_charts_when_accessible(tmp_path):
     (comparison_chart_dir / "precision_recall_comparison.png").write_bytes(b"PNG fixture")
     (comparison_chart_dir / "confusion_matrix_xgboost.png").write_bytes(b"PNG fixture")
     (comparison_chart_dir / "calibration_xgboost_detailed.png").write_bytes(b"PNG fixture")
+    (comparison_chart_dir / "shap_feature_importance_top10.png").write_bytes(b"PNG fixture")
+    (comparison_chart_dir / "shap_feature_importance_last10.png").write_bytes(b"PNG fixture")
     chart_dir = tmp_path / "models" / CANDIDATE / "charts"
     chart_dir.mkdir(parents=True)
-    for name in ("feature_importance.png",):
-        (chart_dir / name).write_bytes(b"PNG fixture")
     st = FakeStreamlit()
     render_research_dashboard(st, tmp_path)
-    assert len([name for name, _, _ in st.calls if name == "image"]) == 4
+    assert len([name for name, _, _ in st.calls if name == "image"]) == 5
+    assert any(name == "columns" and args == ([1, 2, 1],) for name, args, _ in st.calls)
     assert not any(name == "metric" for name, _, _ in st.calls)
     charts = [args[0] for name, args, _ in st.calls if name == "altair_chart"]
     assert len(charts) == 2

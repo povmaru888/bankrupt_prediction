@@ -72,3 +72,17 @@ def test_calibration_bin_summary_rejects_non_finite_scores():
             np.array([0.1, 0.2, np.nan, 0.4]),
             n_bins=2,
         )
+
+
+def test_shap_extreme_charts_use_disjoint_rankings(tmp_path: Path):
+    importance = {f"feature_{index:02d}": float(index) for index in range(25)}
+    top_path, last_path, top, last = posthoc_comparison.plot_shap_importance_extremes(
+        importance,
+        tmp_path / "top.png",
+        tmp_path / "last.png",
+    )
+    assert top_path.read_bytes().startswith(b"\x89PNG")
+    assert last_path.read_bytes().startswith(b"\x89PNG")
+    assert top[0] == ("feature_24", 24.0)
+    assert last[0] == ("feature_00", 0.0)
+    assert {name for name, _ in top}.isdisjoint(name for name, _ in last)

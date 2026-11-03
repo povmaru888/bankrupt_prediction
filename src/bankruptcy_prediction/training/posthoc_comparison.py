@@ -6,6 +6,7 @@ import hashlib
 import html
 import json
 import re
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ import matplotlib.pyplot as plt
 from bankruptcy_prediction.data.feature_schema import build_feature_schema
 from bankruptcy_prediction.data.training_loader import load_training_data
 from bankruptcy_prediction.evaluation.metrics import evaluate_frozen_scores
+from bankruptcy_prediction.explanation.shap_service import mean_absolute_shap_importance
 from bankruptcy_prediction.model_package.verifier import verify_package
 from bankruptcy_prediction.training.calibration import calibrate_candidate
 from bankruptcy_prediction.training.logistic_pipeline import build_logistic_pipeline
@@ -371,12 +373,69 @@ def plot_detailed_calibration(
     return output, evidence
 
 
+def _plot_ranked_shap(
+    items: list[tuple[str, float]],
+    output_path: str | Path,
+    title: str,
+    color: str,
+) -> Path:
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(9.2, max(4.8, 0.48 * len(items))), constrained_layout=True)
+    names = [name for name, _ in items]
+    values = [value for _, value in items]
+    bars = axis.barh(names, values, color=color, height=0.62)
+    axis.invert_yaxis()
+    axis.set_xlabel("Mean absolute SHAP contribution")
+    axis.set_title(title, fontsize=16, fontweight="bold")
+    axis.grid(axis="x", color="#D8DEE8", linewidth=0.7, alpha=0.65)
+    axis.spines[["top", "right", "left"]].set_visible(False)
+    axis.tick_params(axis="y", length=0)
+    maximum = max(values, default=0.0)
+    if maximum > 0:
+        axis.set_xlim(0.0, maximum * 1.18)
+        axis.bar_label(bars, fmt="%.6f", padding=4, fontsize=8, color="#374151")
+    figure.savefig(output, dpi=180, facecolor="white")
+    plt.close(figure)
+    return output
+
+
+def plot_shap_importance_extremes(
+    importance: Mapping[str, float],
+    top_output_path: str | Path,
+    last_output_path: str | Path,
+) -> tuple[Path, Path, list[tuple[str, float]], list[tuple[str, float]]]:
+    """Render the ten highest and ten lowest full-matrix mean absolute SHAP values."""
+    items = [(str(name), float(value)) for name, value in importance.items()]
+    if len(items) < 20:
+        raise ValueError("at least 20 SHAP features are required for top and last rankings")
+    if any(not np.isfinite(value) or value < 0 for _, value in items):
+        raise ValueError("SHAP importance values must be finite and non-negative")
+    top = sorted(items, key=lambda item: (-item[1], item[0]))[:10]
+    last = sorted(items, key=lambda item: (item[1], item[0]))[:10]
+    top_path = _plot_ranked_shap(
+        top,
+        top_output_path,
+        "Top 10 SHAP Feature Importance · XGBoost",
+        "#0B3A75",
+    )
+    last_path = _plot_ranked_shap(
+        last,
+        last_output_path,
+        "Last 10 SHAP Feature Importance · XGBoost",
+        "#9A6A45",
+    )
+    return top_path, last_path, top, last
+
+
 def evaluate_posthoc_logistic(
     data_path: str | Path,
     candidate_dir: str | Path,
     chart_output: str | Path | None = None,
     confusion_chart_output: str | Path | None = None,
     calibration_chart_output: str | Path | None = None,
+    shap_top_chart_output: str | Path | None = None,
+    shap_last_chart_output: str | Path | None = None,
 ) -> dict[str, Any]:
     """Rebuild the persisted LR winner and evaluate the original final-test partition once."""
     candidate = Path(candidate_dir)
@@ -490,6 +549,36 @@ def evaluate_posthoc_logistic(
             calibration_chart_path.read_bytes()
         ).hexdigest()
 
+    shap_evidence: dict[str, Any] = {
+        "partition": "validation",
+        "sample_count": len(X_validation),
+        "aggregation": "mean absolute SHAP over all features and five calibrated base estimators",
+        "non_causal": True,
+    }
+    if shap_top_chart_output is not None or shap_last_chart_output is not None:
+        if shap_top_chart_output is None or shap_last_chart_output is None:
+            raise ValueError("both SHAP top and last chart outputs must be provided")
+        shap_importance = mean_absolute_shap_importance("xgboost", xgboost_model, X_validation)
+        shap_top_path, shap_last_path, shap_top, shap_last = plot_shap_importance_extremes(
+            shap_importance,
+            shap_top_chart_output,
+            shap_last_chart_output,
+        )
+        shap_evidence.update(
+            {
+                "feature_count": len(shap_importance),
+                "importance": shap_importance,
+                "top_10": [
+                    {"feature_name": name, "mean_absolute_shap": value} for name, value in shap_top
+                ],
+                "last_10": [
+                    {"feature_name": name, "mean_absolute_shap": value} for name, value in shap_last
+                ],
+                "top_chart_sha256": hashlib.sha256(shap_top_path.read_bytes()).hexdigest(),
+                "last_chart_sha256": hashlib.sha256(shap_last_path.read_bytes()).hexdigest(),
+            }
+        )
+
     serializable_parameters = dict(persisted["best_parameters"])
     return {
         "comparison_type": "posthoc_final_test_comparison",
@@ -510,6 +599,7 @@ def evaluate_posthoc_logistic(
         "precision_recall_comparison": chart_evidence,
         "xgboost_confusion_matrix_chart": confusion_evidence,
         "xgboost_calibration_chart": calibration_evidence,
+        "xgboost_shap_importance": shap_evidence,
         "xgboost_binary": {
             "model_version": manifest["version"],
             "metrics": xgboost_metrics,
