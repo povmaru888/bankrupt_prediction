@@ -48,3 +48,27 @@ def test_labeled_confusion_matrix_rejects_invalid_shape(tmp_path: Path):
         posthoc_comparison.plot_labeled_confusion_matrix(
             [[1, 2, 3]], 0.5, tmp_path / "confusion.png"
         )
+
+
+def test_detailed_calibration_writes_chart_and_preserves_bin_totals(tmp_path: Path):
+    labels = np.array([0] * 16 + [1] * 4)
+    scores = np.linspace(0.01, 0.40, 20)
+    output, evidence = posthoc_comparison.plot_detailed_calibration(
+        labels,
+        scores,
+        tmp_path / "calibration.png",
+        n_bins=5,
+    )
+    assert output.read_bytes().startswith(b"\x89PNG")
+    assert sum(evidence["sample_count"]) == 20
+    assert sum(evidence["positive_count"]) == 4
+    assert len(evidence["mean_score"]) == 5
+
+
+def test_calibration_bin_summary_rejects_non_finite_scores():
+    with pytest.raises(ValueError, match="finite"):
+        posthoc_comparison._calibration_bin_summary(
+            np.array([0, 1, 0, 1]),
+            np.array([0.1, 0.2, np.nan, 0.4]),
+            n_bins=2,
+        )

@@ -36,12 +36,22 @@ def main() -> int:
             root / "experiments" / "posthoc-final-test-comparison" / "confusion_matrix_xgboost.png"
         ),
     )
+    parser.add_argument(
+        "--calibration-chart-output",
+        default=str(
+            root
+            / "experiments"
+            / "posthoc-final-test-comparison"
+            / "calibration_xgboost_detailed.png"
+        ),
+    )
     args = parser.parse_args()
     result = evaluate_posthoc_logistic(
         args.data,
         args.candidate,
         chart_output=args.chart_output,
         confusion_chart_output=args.confusion_chart_output,
+        calibration_chart_output=args.calibration_chart_output,
     )
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)

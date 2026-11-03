@@ -18,7 +18,10 @@ CHARTS = (
         "Precision–Recall · XGBoost vs Logistic Regression",
         "experiments/posthoc-final-test-comparison/precision_recall_comparison.png",
     ),
-    ("Calibration · XGBoost", f"models/{CANDIDATE}/charts/calibration.png"),
+    (
+        "Calibration · XGBoost",
+        "experiments/posthoc-final-test-comparison/calibration_xgboost_detailed.png",
+    ),
     (
         "Confusion Matrix · XGBoost",
         "experiments/posthoc-final-test-comparison/confusion_matrix_xgboost.png",

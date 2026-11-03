@@ -608,6 +608,7 @@ P4-07 -> P5-05 -> P5-07 -> P5-08 -> P5-10 -> Release
 - [x] H7 美化 AP 圖表：XGBoost 深藍、細長柱、統一尺度與柱頂數值。
 - [x] H8 以相同 held-out final test 重繪 Logistic Regression 與 XGBoost PR curve，標示 AP、盛行率基準、樣本數及事後授權比較，並通過完整回歸測試（240 passed）。
 - [x] H9 依 TN／FP／FN／TP 格式重繪 XGBoost confusion matrix，標示實際數量、類別定義、final-test 與門檻，並通過完整回歸測試（242 passed）。
+- [x] H10 強化 XGBoost calibration 圖：保留 0–1 全尺度、增加 0–0.25 放大圖、分數直方圖及十個分箱樣本／正例標示，並通過完整回歸測試（244 passed）。
 
 ### [x] P4-01 建立 Streamlit 應用殼層與 API Client
 

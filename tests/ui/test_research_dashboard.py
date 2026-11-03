@@ -58,12 +58,10 @@ def test_dashboard_shows_baseline_and_original_charts_when_accessible(tmp_path):
     comparison_chart_dir.mkdir(parents=True)
     (comparison_chart_dir / "precision_recall_comparison.png").write_bytes(b"PNG fixture")
     (comparison_chart_dir / "confusion_matrix_xgboost.png").write_bytes(b"PNG fixture")
+    (comparison_chart_dir / "calibration_xgboost_detailed.png").write_bytes(b"PNG fixture")
     chart_dir = tmp_path / "models" / CANDIDATE / "charts"
     chart_dir.mkdir(parents=True)
-    for name in (
-        "calibration.png",
-        "feature_importance.png",
-    ):
+    for name in ("feature_importance.png",):
         (chart_dir / name).write_bytes(b"PNG fixture")
     st = FakeStreamlit()
     render_research_dashboard(st, tmp_path)

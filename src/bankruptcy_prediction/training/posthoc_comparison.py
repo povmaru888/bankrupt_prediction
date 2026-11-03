@@ -191,7 +191,7 @@ def plot_labeled_confusion_matrix(
     for spine in axis.spines.values():
         spine.set_visible(False)
 
-    fig.suptitle("Confusion Matrix · XGBoost", fontsize=20, fontweight="semibold", y=0.95)
+    fig.suptitle("Confusion Matrix · XGBoost", fontsize=20, fontweight="bold", y=0.95)
     axis.set_title(
         f"Held-out final test · threshold = {threshold:.4f}",
         fontsize=11,
@@ -209,11 +209,174 @@ def plot_labeled_confusion_matrix(
     return output
 
 
+def _calibration_bin_summary(
+    labels: np.ndarray,
+    scores: np.ndarray,
+    n_bins: int = 10,
+) -> dict[str, np.ndarray]:
+    """Summarize equal-frequency calibration bins without discarding empty-class bins."""
+    actual = np.asarray(labels, dtype=int)
+    confidence = np.asarray(scores, dtype=float)
+    if actual.ndim != 1 or confidence.ndim != 1 or len(actual) != len(confidence):
+        raise ValueError("labels and scores must be one-dimensional arrays of equal length")
+    if len(actual) < n_bins or n_bins < 2:
+        raise ValueError("calibration requires at least two populated bins")
+    if np.any(~np.isfinite(confidence)) or np.any((confidence < 0) | (confidence > 1)):
+        raise ValueError("calibration scores must be finite values between zero and one")
+    order = np.argsort(confidence, kind="stable")
+    groups = np.array_split(order, n_bins)
+    return {
+        "mean_score": np.asarray([confidence[group].mean() for group in groups]),
+        "positive_fraction": np.asarray([actual[group].mean() for group in groups]),
+        "sample_count": np.asarray([len(group) for group in groups], dtype=int),
+        "positive_count": np.asarray([actual[group].sum() for group in groups], dtype=int),
+    }
+
+
+def plot_detailed_calibration(
+    labels: np.ndarray,
+    scores: np.ndarray,
+    output_path: str | Path,
+    n_bins: int = 10,
+) -> tuple[Path, dict[str, list[float] | list[int]]]:
+    """Render full, zoomed and distribution views with auditable bin counts."""
+    actual = np.asarray(labels, dtype=int)
+    confidence = np.asarray(scores, dtype=float)
+    summary = _calibration_bin_summary(actual, confidence, n_bins=n_bins)
+    mean_score = summary["mean_score"]
+    positive_fraction = summary["positive_fraction"]
+    sample_count = summary["sample_count"]
+    positive_count = summary["positive_count"]
+
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig = plt.figure(figsize=(12.5, 10.0), facecolor="white")
+    grid = fig.add_gridspec(
+        3,
+        2,
+        height_ratios=(1.0, 0.78, 0.35),
+        hspace=0.42,
+        wspace=0.27,
+        left=0.08,
+        right=0.97,
+        top=0.90,
+        bottom=0.06,
+    )
+    full_axis = fig.add_subplot(grid[0, 0])
+    zoom_axis = fig.add_subplot(grid[0, 1])
+    histogram_axis = fig.add_subplot(grid[1, :])
+    table_axis = fig.add_subplot(grid[2, :])
+    bin_colors = plt.get_cmap("viridis")(np.linspace(0.12, 0.88, n_bins))
+
+    for axis, x_limit, title in (
+        (full_axis, (0.0, 1.0), "Full scale"),
+        (zoom_axis, (0.0, 0.25), "Zoomed risk range"),
+    ):
+        axis.plot(
+            mean_score,
+            positive_fraction,
+            color="#0B6F6B",
+            linewidth=2.0,
+            alpha=0.85,
+        )
+        axis.scatter(
+            mean_score,
+            positive_fraction,
+            c=bin_colors,
+            s=58,
+            edgecolor="white",
+            linewidth=0.8,
+            zorder=3,
+        )
+        axis.plot((0, 1), (0, 1), color="#6B7280", linestyle="--", linewidth=1.4)
+        axis.set(
+            xlim=x_limit,
+            ylim=(0.0, 1.0 if x_limit[1] == 1.0 else 0.30),
+            xlabel="Mean model confidence score",
+            ylabel="Observed positive fraction",
+            title=title,
+        )
+        axis.grid(True, color="#D8DEE8", linewidth=0.7, alpha=0.65)
+        axis.spines[["top", "right"]].set_visible(False)
+    zoom_axis.plot([], [], color="#6B7280", linestyle="--", label="Ideal calibration")
+    zoom_axis.legend(loc="upper left", frameon=False)
+
+    histogram_bins = np.linspace(0.0, 1.0, 41)
+    histogram_axis.hist(
+        (confidence[actual == 0], confidence[actual == 1]),
+        bins=histogram_bins,
+        stacked=True,
+        color=("#AFC7E6", "#D97941"),
+        edgecolor="white",
+        linewidth=0.35,
+        label=("Actual negative", "Actual positive"),
+    )
+    histogram_axis.set_yscale("log")
+    histogram_axis.set(
+        xlim=(0.0, 1.0),
+        xlabel="Model confidence score",
+        ylabel="Sample count (log scale)",
+        title="Score distribution on held-out final test",
+    )
+    histogram_axis.grid(True, axis="y", color="#D8DEE8", linewidth=0.7, alpha=0.65)
+    histogram_axis.spines[["top", "right"]].set_visible(False)
+    histogram_axis.legend(loc="upper right", frameon=False)
+
+    table_axis.axis("off")
+    column_labels = [f"B{index}" for index in range(1, n_bins + 1)]
+    table_values = [
+        [f"{value:.4f}" for value in mean_score],
+        [f"{value:,}" for value in sample_count],
+        [f"{value:,}" for value in positive_count],
+    ]
+    table = table_axis.table(
+        cellText=table_values,
+        rowLabels=("Mean score", "Samples", "Positives"),
+        colLabels=column_labels,
+        cellLoc="center",
+        rowLoc="right",
+        loc="center",
+        colColours=[color for color in bin_colors],
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(9)
+    table.scale(1.0, 1.45)
+    for (row, column), cell in table.get_celld().items():
+        cell.set_edgecolor("#D1D5DB")
+        if row == 0 and column >= 0:
+            cell.set_text_props(color="white", fontweight="bold")
+
+    fig.suptitle(
+        "XGBoost Calibration · Held-out Final Test",
+        fontsize=20,
+        fontweight="bold",
+        y=0.965,
+    )
+    fig.text(
+        0.5,
+        0.925,
+        f"Equal-frequency bins = {n_bins} · n = {len(actual):,} · positives = {int(actual.sum()):,}",
+        ha="center",
+        fontsize=10,
+        color="#4B5563",
+    )
+    fig.savefig(output, dpi=180, facecolor="white")
+    plt.close(fig)
+    evidence: dict[str, list[float] | list[int]] = {
+        "mean_score": mean_score.tolist(),
+        "positive_fraction": positive_fraction.tolist(),
+        "sample_count": sample_count.tolist(),
+        "positive_count": positive_count.tolist(),
+    }
+    return output, evidence
+
+
 def evaluate_posthoc_logistic(
     data_path: str | Path,
     candidate_dir: str | Path,
     chart_output: str | Path | None = None,
     confusion_chart_output: str | Path | None = None,
+    calibration_chart_output: str | Path | None = None,
 ) -> dict[str, Any]:
     """Rebuild the persisted LR winner and evaluate the original final-test partition once."""
     candidate = Path(candidate_dir)
@@ -309,6 +472,24 @@ def evaluate_posthoc_logistic(
             confusion_chart_path.read_bytes()
         ).hexdigest()
 
+    calibration_evidence: dict[str, Any] = {
+        "partition": "held_out_final_test",
+        "binning": "10 equal-frequency bins",
+        "sample_count": len(X_test),
+        "positive_count": int(y_test.sum()),
+    }
+    if calibration_chart_output is not None:
+        calibration_chart_path, bin_summary = plot_detailed_calibration(
+            y_test.to_numpy(),
+            xgboost_test_scores,
+            calibration_chart_output,
+            n_bins=10,
+        )
+        calibration_evidence["bins"] = bin_summary
+        calibration_evidence["chart_sha256"] = hashlib.sha256(
+            calibration_chart_path.read_bytes()
+        ).hexdigest()
+
     serializable_parameters = dict(persisted["best_parameters"])
     return {
         "comparison_type": "posthoc_final_test_comparison",
@@ -328,6 +509,7 @@ def evaluate_posthoc_logistic(
         },
         "precision_recall_comparison": chart_evidence,
         "xgboost_confusion_matrix_chart": confusion_evidence,
+        "xgboost_calibration_chart": calibration_evidence,
         "xgboost_binary": {
             "model_version": manifest["version"],
             "metrics": xgboost_metrics,
