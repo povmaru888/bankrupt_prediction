@@ -175,6 +175,26 @@ After a trusted candidate has been reviewed and activated via the documented CLI
 
 Both applications are configured for **localhost-only** use. If no valid active model exists, scoring is unavailable until activation.
 
+### Streamlit Community Cloud
+
+The repository root contains the Community Cloud entry point `streamlit_app.py`.
+When the local launcher has not supplied `BANKRUPTCY_API_BASE_URL`, that entry
+point starts the same FastAPI application on loopback inside the managed
+Streamlit container. The API remains inaccessible from the public network;
+browser traffic reaches only Streamlit.
+
+Deployment settings:
+
+- Repository: `povmaru888/bankrupt_prediction`
+- Branch: `main`
+- Main file: `streamlit_app.py`
+- Python: 3.12
+
+The checked-in model package is intentionally limited to the verified active
+candidate required for inference. Uploaded CSV content is request-scoped and
+must not contain confidential data because the hosted dashboard is a public
+research demonstration.
+
 ### Run checks
 
 ```powershell

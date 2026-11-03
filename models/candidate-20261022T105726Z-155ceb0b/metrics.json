@@ -1,0 +1,27 @@
+{
+  "average_precision": 0.5204117870239202,
+  "positive_prevalence": 0.03225806451612903,
+  "ap_to_prevalence_ratio": 16.132765397741526,
+  "precision": 0.3333333333333333,
+  "recall": 0.6590909090909091,
+  "f1": 0.44274809160305345,
+  "brier_score": 0.022151700204452243,
+  "confusion_matrix": [
+    [
+      1262,
+      58
+    ],
+    [
+      15,
+      29
+    ]
+  ],
+  "false_positive_count": 58,
+  "recall_at_top_10_percent": 0.75,
+  "top_10_percent_row_count": 137,
+  "top_10_percent_positive_count": 33,
+  "sample_count": 1364,
+  "threshold": 0.04979437942223049,
+  "mvp_passed": true,
+  "mvp_failure_reasons": []
+}
