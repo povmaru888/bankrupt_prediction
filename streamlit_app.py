@@ -17,5 +17,13 @@ if __name__ == "__main__":
     # its own process.  Streamlit Community Cloud starts only this script, so
     # it receives a loopback-only API thread inside the same container.
     if not os.environ.get("BANKRUPTCY_API_BASE_URL"):
-        ensure_embedded_api()
+        # Keep the cloud-only service away from the legacy port 8000.  A
+        # Streamlit hot reload can leave the previous daemon thread alive;
+        # using a deployment-specific port guarantees that the UI talks to
+        # the API created from the current source revision.
+        cloud_api_port = 8765
+        os.environ["BANKRUPTCY_API_BASE_URL"] = (
+            f"http://127.0.0.1:{cloud_api_port}"
+        )
+        ensure_embedded_api(port=cloud_api_port)
     main()
