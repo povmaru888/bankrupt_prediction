@@ -38,3 +38,31 @@ def test_app_shell_has_four_pages_and_disables_scoring_without_model():
     assert len(PAGE_NAMES) == 4
     button = next(call for call in calls if call[0] == "button")
     assert button[2]["disabled"] is True
+
+
+def test_app_shell_displays_safe_model_reason_code():
+    calls = []
+
+    class FakeStreamlit:
+        session_state = {}
+
+        def __getattr__(self, name):
+            def method(*args, **kwargs):
+                calls.append((name, args, kwargs))
+                if name == "radio":
+                    return PAGE_NAMES[1]
+                return None
+
+            return method
+
+    class DegradedClient:
+        def health(self):
+            return {
+                "status": "degraded",
+                "active_model_loaded": False,
+                "reason_code": "model_load_failed",
+            }
+
+    render_app(DegradedClient(), streamlit_module=FakeStreamlit())
+    warning = next(call for call in calls if call[0] == "warning")
+    assert "reason_code: model_load_failed" in warning[1][0]

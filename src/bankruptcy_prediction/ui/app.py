@@ -60,7 +60,11 @@ def render_app(client: ApiClient | None = None, *, streamlit_module: Any | None 
             st.error(str(exc))
             health = {"active_model_loaded": False}
     if not health.get("active_model_loaded", False):
-        st.warning("目前沒有可用的 active model；批次評分控制已停用。")
+        reason_code = str(health.get("reason_code", "unknown")).strip() or "unknown"
+        st.warning(
+            "目前沒有可用的 active model；批次評分控制已停用。"
+            f"（reason_code: {reason_code}）"
+        )
     selected = st.radio("頁面", PAGE_NAMES, horizontal=True)
     st.session_state.setdefault("selected_page", selected)
     st.session_state["selected_page"] = selected
