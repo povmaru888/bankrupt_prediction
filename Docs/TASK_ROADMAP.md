@@ -611,6 +611,7 @@ P4-07 -> P5-05 -> P5-07 -> P5-08 -> P5-10 -> Release
 - [x] H10 強化 XGBoost calibration 圖：保留 0–1 全尺度、增加 0–0.25 放大圖、分數直方圖及十個分箱樣本／正例標示，並通過完整回歸測試（244 passed）。
 - [x] H11 以完整 validation SHAP 矩陣同源重建 XGBoost Top 10，並新增 Last 10 特徵重要度圖。
 - [x] H12 將單張 XGBoost confusion matrix 置中限制為半寬，與成對研究圖維持一致視覺尺度。
+- [x] H13 以現行 XGBoost 超參數比較 fold-balanced 與 unweighted class weight，使用 validation 選門檻並依明確授權比較 held-out test。
 
 ### [x] P4-01 建立 Streamlit 應用殼層與 API Client
 

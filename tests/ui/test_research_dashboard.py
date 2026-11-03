@@ -8,6 +8,7 @@ from bankruptcy_prediction.ui.pages.research_dashboard import (
     CANDIDATE,
     ResearchDataError,
     _ap_comparison_chart,
+    load_class_weight_comparison,
     load_final_test_comparison,
     load_objective_comparison,
     load_research_metrics,
@@ -52,6 +53,12 @@ def test_dashboard_shows_baseline_and_original_charts_when_accessible(tmp_path):
     (experiment_dir / "comparison.json").write_text(
         source.read_text(encoding="utf-8"), encoding="utf-8"
     )
+    weight_source = project / "experiments" / "xgboost-class-weight-20261103" / "comparison.json"
+    weight_dir = tmp_path / "experiments" / "xgboost-class-weight-20261103"
+    weight_dir.mkdir(parents=True)
+    (weight_dir / "comparison.json").write_text(
+        weight_source.read_text(encoding="utf-8"), encoding="utf-8"
+    )
     posthoc_source = project / "experiments" / "posthoc-final-test-comparison.json"
     (tmp_path / "experiments" / "posthoc-final-test-comparison.json").write_text(
         posthoc_source.read_text(encoding="utf-8"), encoding="utf-8"
@@ -78,6 +85,16 @@ def test_dashboard_shows_baseline_and_original_charts_when_accessible(tmp_path):
     assert training_spec["layer"][0]["encoding"]["color"]["scale"]["range"][1] == "#0B3A75"
     assert load_training_comparison(tmp_path).loc["XGBoost", "Validation AP"] > 0.53
     assert load_objective_comparison(tmp_path).loc["rank:pairwise", "AP"] > 0.57
+    weight_comparison = load_class_weight_comparison(tmp_path)
+    balanced_test = weight_comparison[
+        (weight_comparison["Dataset"] == "Held-out test")
+        & (weight_comparison["Class weight"] == "Balanced")
+    ].iloc[0]
+    unweighted_test = weight_comparison[
+        (weight_comparison["Dataset"] == "Held-out test")
+        & (weight_comparison["Class weight"] == "Unweighted")
+    ].iloc[0]
+    assert balanced_test["AP"] > unweighted_test["AP"]
     final_comparison, xgboost, logistic = load_final_test_comparison(tmp_path)
     assert list(final_comparison.columns) == ["指標", "XGBoost binary", "Logistic Regression"]
     assert xgboost["average_precision"] > logistic["average_precision"]
@@ -101,6 +118,37 @@ def test_ap_chart_uses_shared_scale_and_thin_deep_blue_xgboost_bar():
         "domain": ["Logistic Regression", "XGBoost"],
         "range": ["#91A2B8", "#0B3A75"],
     }
+
+
+def test_load_class_weight_comparison_keeps_validation_and_test_separate(tmp_path):
+    output = tmp_path / "experiments" / "xgboost-class-weight-20261103"
+    output.mkdir(parents=True)
+    metrics = {
+        "average_precision": 0.5,
+        "precision": 0.3,
+        "recall": 0.7,
+        "f1": 0.42,
+        "brier_score": 0.02,
+        "recall_at_top_10_percent": 0.75,
+        "false_positive_count": 12,
+        "threshold": 0.05,
+    }
+    (output / "comparison.json").write_text(
+        __import__("json").dumps(
+            {
+                "balanced": {"validation_metrics": metrics, "test_metrics": metrics},
+                "unweighted": {"validation_metrics": metrics, "test_metrics": metrics},
+            }
+        ),
+        encoding="utf-8",
+    )
+    frame = load_class_weight_comparison(tmp_path)
+    assert frame[["Dataset", "Class weight"]].values.tolist() == [
+        ["Validation", "Balanced"],
+        ["Held-out test", "Balanced"],
+        ["Validation", "Unweighted"],
+        ["Held-out test", "Unweighted"],
+    ]
 
 
 def test_dashboard_handles_permission_denied_without_fabricating_shap(tmp_path, monkeypatch):

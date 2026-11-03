@@ -254,6 +254,49 @@ def load_objective_comparison(root: Path = PROJECT_ROOT) -> pd.DataFrame:
     return pd.DataFrame(rows).set_index("Objective")
 
 
+def load_class_weight_comparison(root: Path = PROJECT_ROOT) -> pd.DataFrame:
+    """Load the controlled balanced-versus-unweighted XGBoost experiment."""
+    path = root / "experiments" / "xgboost-class-weight-20261103" / "comparison.json"
+    evidence = _read_json(path)
+    rows = []
+    for model_key, model_label in (("balanced", "Balanced"), ("unweighted", "Unweighted")):
+        item = evidence.get(model_key)
+        if not isinstance(item, dict):
+            raise ResearchDataError(f"class-weight 實驗資料不完整：{model_key}")
+        for partition_key, partition_label in (
+            ("validation_metrics", "Validation"),
+            ("test_metrics", "Held-out test"),
+        ):
+            metrics = item.get(partition_key)
+            required = (
+                "average_precision",
+                "precision",
+                "recall",
+                "f1",
+                "brier_score",
+                "recall_at_top_10_percent",
+                "false_positive_count",
+                "threshold",
+            )
+            if not isinstance(metrics, dict) or not all(name in metrics for name in required):
+                raise ResearchDataError(f"class-weight 實驗指標不完整：{model_key}.{partition_key}")
+            rows.append(
+                {
+                    "Dataset": partition_label,
+                    "Class weight": model_label,
+                    "AP": float(metrics["average_precision"]),
+                    "Precision": float(metrics["precision"]),
+                    "Recall": float(metrics["recall"]),
+                    "F1": float(metrics["f1"]),
+                    "Brier": float(metrics["brier_score"]),
+                    "Recall@Top10%": float(metrics["recall_at_top_10_percent"]),
+                    "False positives": int(metrics["false_positive_count"]),
+                    "Threshold": float(metrics["threshold"]),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def load_final_test_comparison(
     root: Path = PROJECT_ROOT,
 ) -> tuple[pd.DataFrame, dict[str, Any], dict[str, Any]]:
@@ -374,6 +417,35 @@ def render_research_dashboard(st: Any, root: Path = PROJECT_ROOT) -> None:
             "原始選模階段未以 final test 比較模型；上方 Logistic Regression 數值為事後明確授權的補評估。"
         )
     except (ResearchDataError, TypeError, ValueError, KeyError, ZeroDivisionError) as exc:
+        st.warning(str(exc))
+
+    st.markdown("### XGBoost class weight · Balanced vs Unweighted")
+    try:
+        class_weight = load_class_weight_comparison(root)
+        st.dataframe(
+            class_weight.style.format(
+                {
+                    "AP": "{:.4f}",
+                    "Precision": "{:.2%}",
+                    "Recall": "{:.2%}",
+                    "F1": "{:.2%}",
+                    "Brier": "{:.5f}",
+                    "Recall@Top10%": "{:.2%}",
+                    "Threshold": "{:.6f}",
+                }
+            ),
+            hide_index=True,
+            width="stretch",
+        )
+        st.caption(
+            "唯一控制變因為 scale_pos_weight：Balanced 由每個 training fold 的負／正樣本比估計，"
+            "Unweighted 固定為 1.0；其他 XGBoost 超參數及切分相同。兩者門檻均只以 validation F2 選定。"
+        )
+        st.caption(
+            "Held-out test 比較為使用者明確授權的事後消融實驗，不回饋訓練、門檻或 active model；"
+            "Unweighted 未獨立重做超參數搜尋。"
+        )
+    except (ResearchDataError, TypeError, ValueError, KeyError) as exc:
         st.warning(str(exc))
 
     st.markdown("### Validation objective experiments · XGBoost")
