@@ -155,7 +155,13 @@ def load_active_model(models_root: str | Path) -> ActiveModel:
         package_path.resolve(strict=True).relative_to(root_resolved)
     except (OSError, ValueError) as exc:
         raise ActiveModelUnavailable(
-            "invalid_active_model", "active model package is missing or failed verification"
+            "invalid_active_model",
+            "active model package is missing or failed verification",
+            reason_detail=(
+                "active model package directory is unavailable"
+                if not package_path.exists()
+                else "active model package directory escapes the models root"
+            ),
         ) from exc
     try:
         package = verify_package(package_path)
