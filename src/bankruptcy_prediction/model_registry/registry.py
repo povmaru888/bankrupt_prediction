@@ -26,10 +26,11 @@ VERSION_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 class ActiveModelUnavailable(RuntimeError):
     """Safe explanation for why no active model can currently serve predictions."""
 
-    def __init__(self, error_code: str, message: str) -> None:
+    def __init__(self, error_code: str, message: str, *, reason_detail: str | None = None) -> None:
         super().__init__(message)
         self.error_code = error_code
         self.message = message
+        self.reason_detail = reason_detail
 
 
 @dataclass(frozen=True)
@@ -160,7 +161,9 @@ def load_active_model(models_root: str | Path) -> ActiveModel:
         package = verify_package(package_path)
     except PackageVerificationError as exc:
         raise ActiveModelUnavailable(
-            "invalid_active_model", "active model package is missing or failed verification"
+            "invalid_active_model",
+            "active model package is missing or failed verification",
+            reason_detail=str(exc),
         ) from exc
 
     checksums = package.manifest["files"]["sha256"]

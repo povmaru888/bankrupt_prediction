@@ -65,6 +65,8 @@ def render_app(client: ApiClient | None = None, *, streamlit_module: Any | None 
             "目前沒有可用的 active model；批次評分控制已停用。"
             f"（reason_code: {reason_code}）"
         )
+        if health.get("reason_detail"):
+            st.caption(str(health["reason_detail"]))
     selected = st.radio("頁面", PAGE_NAMES, horizontal=True)
     st.session_state.setdefault("selected_page", selected)
     st.session_state["selected_page"] = selected

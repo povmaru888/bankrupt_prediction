@@ -21,11 +21,14 @@ async def health(request: Request) -> dict[str, object]:
     try:
         model = resolve_active_model(request)
     except ActiveModelUnavailable as exc:
-        return {
+        payload: dict[str, object] = {
             "status": "degraded",
             "active_model_loaded": False,
             "reason_code": exc.error_code,
         }
+        if exc.reason_detail:
+            payload["reason_detail"] = exc.reason_detail
+        return payload
     return {
         "status": "ok",
         "active_model_loaded": True,
