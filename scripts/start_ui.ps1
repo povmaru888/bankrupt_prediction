@@ -9,6 +9,7 @@ $python = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $python)) { throw "Virtual environment Python was not found." }
 $env:BANKRUPTCY_API_BASE_URL = "http://127.0.0.1:$ApiPort"
 $env:PYTHONPATH = (Join-Path $ProjectRoot "src")
+$env:BANKRUPTCY_FULL_LOCAL_APP = "1"
 $entryPoint = Join-Path $ProjectRoot "streamlit_app.py"
 Push-Location -LiteralPath $ProjectRoot
 try {

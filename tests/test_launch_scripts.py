@@ -14,6 +14,7 @@ def test_launch_scripts_are_loopback_only_and_use_expected_ports():
 def test_ui_launcher_uses_stable_root_entrypoint_and_src_import_path():
     ui = (ROOT / "scripts" / "start_ui.ps1").read_text(encoding="utf-8")
     assert '$env:PYTHONPATH = (Join-Path $ProjectRoot "src")' in ui
+    assert '$env:BANKRUPTCY_FULL_LOCAL_APP = "1"' in ui
     assert 'Join-Path $ProjectRoot "streamlit_app.py"' in ui
     assert "src\\bankruptcy_prediction\\ui\\app.py" not in ui
     assert (ROOT / "streamlit_app.py").is_file()
