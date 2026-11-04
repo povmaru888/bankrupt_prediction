@@ -21,7 +21,7 @@ if __name__ == "__main__":
         # Streamlit hot reload can leave the previous daemon thread alive;
         # using a deployment-specific port guarantees that the UI talks to
         # the API created from the current source revision.
-        cloud_api_port = 8765
+        cloud_api_port = 8766
         os.environ["BANKRUPTCY_API_BASE_URL"] = (
             f"http://127.0.0.1:{cloud_api_port}"
         )

@@ -212,7 +212,7 @@ def verify_package(path: str | Path) -> VerifiedPackage:
     artifacts = {relative: _safe_artifact(root, relative) for relative in REQUIRED_FILES}
     for relative, artifact in artifacts.items():
         if _sha256(artifact) != checksums[relative]:
-            raise _fail("a package file checksum does not match")
+            raise _fail(f"package file checksum does not match: {relative}")
 
     schema = _read_json(artifacts["feature_schema.json"], "feature_schema.json")
     metrics = _read_json(artifacts["metrics.json"], "metrics.json")
