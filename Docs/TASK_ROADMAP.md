@@ -931,3 +931,11 @@ MVP 完成必須同時滿足：
 - [x] E03 完成 `reg:pseudohubererror` 搜尋、fold-local 類別權重、全 training refit、validation 評估與可攜模型保存。
 - [x] E04 以既有 `binary:logistic` 在相同 validation 比較 AP、Recall／Precision@Top10% 及 NDCG@Top10%，獨立重載重算一致。
 - [x] E05 完成比較報告及完整回歸測試（226 passed）；production candidate 未變更。
+
+### Streamlit Community Cloud 部署補充（2026-11-04）
+
+此工作為使用者後續明確擴充的部署範圍，不回溯改變原 SDD 的 localhost MVP 邊界。
+
+- [x] D01 完成 Streamlit Community Cloud 入口、內嵌 loopback FastAPI、固定依賴與公開網址部署。
+- [x] D02 保留模型包完整性驗證，修正 Windows／Linux Git 換行轉換造成的 checksum 差異。
+- [x] D03 於公開網站確認 active XGBoost 模型、模型摘要及批次評分門檻控制可用。
