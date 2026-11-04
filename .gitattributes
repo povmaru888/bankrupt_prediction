@@ -1,2 +1,3 @@
 # Model package checksums cover exact bytes; do not normalize generated reports.
 models/**/model_report.html -text
+models/**/*.json -text
