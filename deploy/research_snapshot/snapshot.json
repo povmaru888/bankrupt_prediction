@@ -1,0 +1,235 @@
+{
+  "active_model": "candidate-20261022T105726Z-155ceb0b",
+  "candidate": "candidate-20261022T105726Z-155ceb0b",
+  "class_weight_comparison": [
+    {
+      "AP": 0.5365993978,
+      "Brier": 0.0214902466,
+      "Class weight": "Balanced",
+      "Dataset": "Validation",
+      "F1": 0.495412844,
+      "False positives": 47,
+      "Precision": 0.3648648649,
+      "Recall": 0.7714285714,
+      "Recall@Top10%": 0.8571428571,
+      "Threshold": 0.0497943794,
+      "index": 0
+    },
+    {
+      "AP": 0.520411787,
+      "Brier": 0.0221517002,
+      "Class weight": "Balanced",
+      "Dataset": "Held-out test",
+      "F1": 0.4427480916,
+      "False positives": 58,
+      "Precision": 0.3333333333,
+      "Recall": 0.6590909091,
+      "Recall@Top10%": 0.75,
+      "Threshold": 0.0497943794,
+      "index": 1
+    },
+    {
+      "AP": 0.4995529013,
+      "Brier": 0.0225656577,
+      "Class weight": "Unweighted",
+      "Dataset": "Validation",
+      "F1": 0.4859813084,
+      "False positives": 46,
+      "Precision": 0.3611111111,
+      "Recall": 0.7428571429,
+      "Recall@Top10%": 0.8285714286,
+      "Threshold": 0.0380280106,
+      "index": 2
+    },
+    {
+      "AP": 0.4993079795,
+      "Brier": 0.0235298091,
+      "Class weight": "Unweighted",
+      "Dataset": "Held-out test",
+      "F1": 0.4242424242,
+      "False positives": 60,
+      "Precision": 0.3181818182,
+      "Recall": 0.6363636364,
+      "Recall@Top10%": 0.75,
+      "Threshold": 0.0380280106,
+      "index": 3
+    }
+  ],
+  "final_test_comparison": [
+    {
+      "Logistic Regression": "0.3255",
+      "XGBoost binary": "0.5204",
+      "index": 0,
+      "指標": "Average Precision"
+    },
+    {
+      "Logistic Regression": "10.09 倍",
+      "XGBoost binary": "16.13 倍",
+      "index": 1,
+      "指標": "AP／盛行率倍率"
+    },
+    {
+      "Logistic Regression": "24.58%",
+      "XGBoost binary": "33.33%",
+      "index": 2,
+      "指標": "Precision"
+    },
+    {
+      "Logistic Regression": "65.91%",
+      "XGBoost binary": "65.91%",
+      "index": 3,
+      "指標": "Recall"
+    },
+    {
+      "Logistic Regression": "35.80%",
+      "XGBoost binary": "44.27%",
+      "index": 4,
+      "指標": "F1"
+    },
+    {
+      "Logistic Regression": "0.02703",
+      "XGBoost binary": "0.02215",
+      "index": 5,
+      "指標": "Brier Score"
+    },
+    {
+      "Logistic Regression": "72.73%",
+      "XGBoost binary": "75.00%",
+      "index": 6,
+      "指標": "Recall@Top10%"
+    },
+    {
+      "Logistic Regression": "89",
+      "XGBoost binary": "58",
+      "index": 7,
+      "指標": "False positives"
+    }
+  ],
+  "final_test_thresholds": {
+    "logistic_regression": 0.05317003691281218,
+    "xgboost": 0.04979437942223049
+  },
+  "generated_at_utc": "2026-11-04T01:02:06.978558+00:00",
+  "images": [
+    {
+      "file": "images/precision_recall_comparison.png",
+      "sha256": "c6bb09207b710e7530c2d4783c333c94c08afc50e3782fa843c1af22e258420f",
+      "title": "Precision–Recall · XGBoost vs Logistic Regression"
+    },
+    {
+      "file": "images/calibration_xgboost_detailed.png",
+      "sha256": "d3ae5e3f98c72fa549d249cef5112d9d3a16b56dbced4aa905001ca1a5fff9c5",
+      "title": "Calibration · XGBoost"
+    },
+    {
+      "file": "images/confusion_matrix_xgboost.png",
+      "sha256": "48375c3c81d0aba7b73025ab1f4f3a95e0a6008fd4f9dd2301e28c951d22871b",
+      "title": "Confusion Matrix · XGBoost"
+    },
+    {
+      "file": "images/shap_feature_importance_top10.png",
+      "sha256": "46dc032d71c32e6db2929bffc97c9bc8456c0b2d125a47fe7a0a3f6e5d336590",
+      "title": "SHAP Feature Importance · Top 10"
+    },
+    {
+      "file": "images/shap_feature_importance_last10.png",
+      "sha256": "f5c60ed00d3e5f008db5de5de7f5a5975bc097abdd2441c26c4ecb7a6a109484",
+      "title": "SHAP Feature Importance · Last 10"
+    }
+  ],
+  "objective_comparison": [
+    {
+      "AP": 0.5365993978,
+      "NDCG@Top10%": 0.7981703104,
+      "Objective": "binary:logistic",
+      "Recall@Top10%": 0.8571428571
+    },
+    {
+      "AP": 0.5758511297,
+      "NDCG@Top10%": 0.7991314914,
+      "Objective": "rank:pairwise",
+      "Recall@Top10%": 0.8285714286
+    },
+    {
+      "AP": 0.5363300148,
+      "NDCG@Top10%": 0.8007694755,
+      "Objective": "reg:pseudohubererror",
+      "Recall@Top10%": 0.8571428571
+    }
+  ],
+  "schema_version": 1,
+  "shap_top_features": [
+    {
+      "chinese": "速動比率",
+      "english": "Quick Ratio",
+      "explanation": "不靠出售存貨，手邊較容易變現的資產夠不夠償還短期債務？",
+      "rank": 1
+    },
+    {
+      "chinese": "總負債／股東權益比",
+      "english": "Total debt/Total net worth",
+      "explanation": "公司背的債相對於股東自己的本錢有多少？",
+      "rank": 2
+    },
+    {
+      "chinese": "近四季每股盈餘",
+      "english": "Persistent EPS in the Last Four Seasons",
+      "explanation": "最近四季平均每一股能賺多少，幫助觀察企業的獲利表現。",
+      "rank": 3
+    },
+    {
+      "chinese": "業外收支占營收比重",
+      "english": "Non-industry income and expenditure/revenue",
+      "explanation": "投資、匯兌或處分資產等本業以外的淨收支，和營業收入相比占多少？",
+      "rank": 4
+    },
+    {
+      "chinese": "每位員工分攤固定資產",
+      "english": "Allocation rate per person",
+      "explanation": "每位員工平均對應多少機器、設備或廠房等固定資產；不是薪資分配率。",
+      "rank": 5
+    },
+    {
+      "chinese": "資產報酬率（C，息折前口徑）",
+      "english": "ROA(C) before interest and depreciation before interest",
+      "explanation": "公司的資產產生獲利的能力如何？這是排除部分利息、折舊影響的資產報酬指標。",
+      "rank": 6
+    },
+    {
+      "chinese": "有息負債相關比率",
+      "english": "Interest-bearing debt interest rate",
+      "explanation": "與需要付利息的借款有關；原資料欄位對照為「有息負債／股東權益」，不能直接當銀行貸款利率。",
+      "rank": 7
+    },
+    {
+      "chinese": "借款依賴／有息負債成本",
+      "english": "Borrowing dependency",
+      "explanation": "觀察借款融資負擔；原資料欄位對照為「有息負債成本」，不宜只按名稱解讀成借款占比。",
+      "rank": 8
+    },
+    {
+      "chinese": "經常性稅後淨利率",
+      "english": "Continuous interest rate (after tax)",
+      "explanation": "排除處分資產等一次性損益後，企業每一元營收大約留下多少淨利？這不是存款利率。",
+      "rank": 9
+    },
+    {
+      "chinese": "經常性淨利成長率",
+      "english": "Continuous Net Profit Growth Rate",
+      "explanation": "不靠賣資產等一次性收益，公司的淨利是在成長還是衰退？",
+      "rank": 10
+    }
+  ],
+  "training_comparison": [
+    {
+      "Training CV AP": 0.407535321,
+      "Validation AP": 0.4235256399,
+      "model": "Logistic Regression"
+    },
+    {
+      "Training CV AP": 0.4447904638,
+      "Validation AP": 0.5365993978,
+      "model": "XGBoost"
+    }
+  ]
+}

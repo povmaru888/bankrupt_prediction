@@ -1,0 +1,2 @@
+# Minimal dependencies for deploy/research_app.py only.
+streamlit==1.65.0
