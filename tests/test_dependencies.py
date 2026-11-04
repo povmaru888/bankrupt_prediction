@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DEPLOYMENT_QUALIFIED_STREAMLIT = "1.65.0"
 
 
 def _pins(path: Path) -> dict[str, str]:
@@ -49,3 +50,10 @@ def test_runtime_and_development_dependencies_are_pinned_and_installed() -> None
 
     for name, expected_version in development.items():
         assert importlib.metadata.version(name) == expected_version
+
+
+def test_streamlit_uses_deployment_qualified_frontend() -> None:
+    """Prevent an unverified frontend bundle from reaching Community Cloud."""
+    runtime = _pins(ROOT / "requirements.txt")
+
+    assert runtime["streamlit"] == DEPLOYMENT_QUALIFIED_STREAMLIT

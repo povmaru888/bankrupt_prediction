@@ -195,6 +195,25 @@ candidate required for inference. Uploaded CSV content is request-scoped and
 must not contain confidential data because the hosted dashboard is a public
 research demonstration.
 
+#### Deployment and browser-cache recovery
+
+The cloud dependency file deliberately pins Streamlit 1.65.0. Do not upgrade
+it independently of a clean-browser deployment check. Streamlit's frontend is
+split into content-hashed JavaScript modules; a tab left open across a hot
+redeploy can retain an old entry module and then request a chunk that the new
+deployment no longer contains. The resulting message names a native widget,
+for example `Failed to fetch dynamically imported module: Selectbox.<hash>.js`,
+but it is not an exception raised by that Python widget.
+
+After changing dependencies, allow the Community Cloud rebuild to finish and
+verify the public URL in a new private/incognito window. Avoid several pushes
+or reboots in quick succession while doing acceptance testing. A browser that
+was already open during deployment must be hard-refreshed (`Ctrl+Shift+R` or
+`Ctrl+F5`); if it still references an old hash, clear site data for the app
+origin and reopen it. Reboot the app once from **Manage app** only when a clean
+browser session also fails—repeated reboots create more frontend revisions and
+do not repair a stale client cache.
+
 ### Run checks
 
 ```powershell

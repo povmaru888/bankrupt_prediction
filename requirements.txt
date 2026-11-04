@@ -12,5 +12,8 @@ pydantic==2.14.1
 uvicorn==0.53.0
 python-multipart==0.0.32
 httpx==0.28.1
-streamlit==1.66.0
+# Keep Community Cloud on the last deployment-qualified frontend.  Streamlit
+# 1.66.0 intermittently leaves browsers requesting removed Vite lazy chunks
+# (for example Selectbox.<hash>.js) after a Cloud hot redeploy.
+streamlit==1.65.0
 PyYAML==6.0.3
