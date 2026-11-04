@@ -13,6 +13,7 @@ SNAPSHOT_DIR = HERE / "research_snapshot"
 SNAPSHOT_PATH = SNAPSHOT_DIR / "snapshot.json"
 
 
+@st.cache_data(show_spinner=False)
 def load_snapshot() -> dict:
     try:
         payload = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
@@ -95,10 +96,21 @@ def main() -> None:
     )
 
     st.header("評估圖表與 SHAP")
-    for start in range(0, len(data["images"]), 2):
-        row = data["images"][start : start + 2]
-        columns = st.columns(len(row))
-        for column, image in zip(columns, row, strict=True):
+    images = data["images"]
+    if len(images) == 5:
+        # Row 1: PR curve & Calibration (2 charts)
+        # Row 2: Confusion Matrix (1 square chart, centered at half width)
+        # Row 3: SHAP Top 10 & SHAP Last 10 (2 charts)
+        chart_rows = [images[:2], images[2:3], images[3:]]
+    else:
+        chart_rows = [images[start : start + 2] for start in range(0, len(images), 2)]
+
+    for row in chart_rows:
+        if len(row) == 1:
+            cols = (st.columns([1, 2, 1])[1],)
+        else:
+            cols = st.columns(len(row))
+        for column, image in zip(cols, row, strict=True):
             with column:
                 st.subheader(image["title"])
                 st.image(str(SNAPSHOT_DIR / image["file"]), width="stretch")

@@ -14,6 +14,8 @@ Preview locally on port 8503:
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run deploy\research_app.py --server.address 127.0.0.1 --server.port 8503
+# 或執行腳本：
+powershell -ExecutionPolicy Bypass -File scripts\start_research_ui.ps1
 ```
 
 If deployed later, use `deploy/research_app.py` as the main file and

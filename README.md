@@ -177,23 +177,20 @@ Both applications are configured for **localhost-only** use. If no valid active 
 
 ### Streamlit Community Cloud
 
-The repository root contains the Community Cloud entry point `streamlit_app.py`.
-When the local launcher has not supplied `BANKRUPTCY_API_BASE_URL`, that entry
-point starts the same FastAPI application on loopback inside the managed
-Streamlit container. The API remains inaccessible from the public network;
-browser traffic reaches only Streamlit.
+The repository provides a lightweight research snapshot deployment for Streamlit Community Cloud.
+The cloud dashboard serves the static research snapshot without loading heavy model binaries,
+running inference, or starting backend APIs.
 
 Deployment settings:
 
 - Repository: `povmaru888/bankrupt_prediction`
 - Branch: `main`
-- Main file: `streamlit_app.py`
+- Main file: `deploy/research_app.py` (or `streamlit_app.py`)
 - Python: 3.12
 
-The checked-in model package is intentionally limited to the verified active
-candidate required for inference. Uploaded CSV content is request-scoped and
-must not contain confidential data because the hosted dashboard is a public
-research demonstration.
+When using `deploy/research_app.py` as the main file, Community Cloud relies on the minimal
+contract in `deploy/requirements.txt` (only `streamlit`), skipping large scientific packages
+like `xgboost` and `shap` for faster boot and lower memory footprint.
 
 #### Deployment and browser-cache recovery
 
