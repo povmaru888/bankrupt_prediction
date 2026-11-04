@@ -1,4 +1,4 @@
-# Runtime dependencies for Windows 11, CPU, Python >=3.11.
+# Runtime dependencies for local Windows and Streamlit Community Cloud, Python >=3.11.
 numpy==2.4.6
 scipy==1.17.1
 pandas==3.0.6

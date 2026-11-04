@@ -18,6 +18,8 @@ class EmbeddedApi:
 
     server: uvicorn.Server
     thread: threading.Thread
+    host: str
+    port: int
 
 
 _INSTANCE: EmbeddedApi | None = None
@@ -43,7 +45,12 @@ def ensure_embedded_api(
 
     global _INSTANCE
     with _LOCK:
-        if _INSTANCE is not None and _INSTANCE.thread.is_alive():
+        if (
+            _INSTANCE is not None
+            and _INSTANCE.thread.is_alive()
+            and _INSTANCE.host == host
+            and _INSTANCE.port == port
+        ):
             return _INSTANCE
         if _port_accepts_connections(host, port):
             return None
@@ -62,7 +69,7 @@ def ensure_embedded_api(
             daemon=True,
         )
         thread.start()
-        _INSTANCE = EmbeddedApi(server=server, thread=thread)
+        _INSTANCE = EmbeddedApi(server=server, thread=thread, host=host, port=port)
 
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
